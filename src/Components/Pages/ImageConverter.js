@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import SEO from '../SEO/SEO';
 import './ImageConverter.css';
 
@@ -373,9 +373,9 @@ const ImageConverter = () => {
               <h3>Popular Conversions</h3>
               <div className="conv-quick-links__grid">
                 {Object.entries(CONVERSION_ROUTES).slice(0, 12).map(([slug, info]) => (
-                  <a key={slug} href={`/convert/${slug}`} className="conv-quick-link">
+                  <Link key={slug} to={`/convert/${slug}`} className="conv-quick-link">
                     <i className="fa-solid fa-right-left"></i> {info.title.replace(' Converter', '')}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
