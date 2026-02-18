@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/youeditfree/static/css/main.59f5757d.css",
-    "main.js": "/youeditfree/static/js/main.9caae7ea.js",
+    "main.js": "/youeditfree/static/js/main.ea1409b5.js",
     "static/js/453.b355b68f.chunk.js": "/youeditfree/static/js/453.b355b68f.chunk.js",
     "index.html": "/youeditfree/index.html",
     "main.59f5757d.css.map": "/youeditfree/static/css/main.59f5757d.css.map",
-    "main.9caae7ea.js.map": "/youeditfree/static/js/main.9caae7ea.js.map",
+    "main.ea1409b5.js.map": "/youeditfree/static/js/main.ea1409b5.js.map",
     "453.b355b68f.chunk.js.map": "/youeditfree/static/js/453.b355b68f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.59f5757d.css",
-    "static/js/main.9caae7ea.js"
+    "static/js/main.ea1409b5.js"
   ]
 }
