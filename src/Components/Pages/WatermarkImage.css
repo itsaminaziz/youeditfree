@@ -263,8 +263,8 @@
 .wm-preview__item img {
   display: block;
   width: 100%;
-  height: 80px;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
 }
 
 .wm-preview__remove {
@@ -1783,33 +1783,97 @@ body.wm-workspace-active .main-content {
   background: #8b5cf6;
 }
 
-/* ---- Private lock button ---- */
+/* ---- Private Mode button ---- */
 .wm-left__private {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid #e2e8f0;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   background: #fff;
-  color: #94a3b8;
-  font-size: 0.88rem;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.18s;
   flex-shrink: 0;
+  font-family: inherit;
+  position: relative;
+}
+
+.wm-left__private i.fa-lock,
+.wm-left__private i.fa-lock-open {
+  font-size: 0.72rem;
 }
 
 .wm-left__private:hover {
   border-color: #818cf8;
-  color: #8b5cf6;
+  color: #6366f1;
   background: #f5f3ff;
 }
 
 .wm-left__private--active {
   border-color: #8b5cf6;
-  background: #f5f3ff;
-  color: #8b5cf6;
+  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+  color: #7c3aed;
+}
+
+.wm-left__private-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
+  font-size: 0.58rem;
+  font-weight: 700;
+  cursor: help;
+  margin-left: 2px;
+  position: relative;
+}
+
+.wm-left__private--active .wm-left__private-info {
+  background: #c4b5fd;
+  color: #4c1d95;
+}
+
+.wm-left__private-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e1b4b;
+  color: #e0e7ff;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  line-height: 1.5;
+  max-width: 260px;
+  white-space: normal;
+  text-align: center;
+}
+
+.wm-left__private-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1e1b4b;
+}
+
+.wm-left__private-info:hover .wm-left__private-tooltip {
+  display: block;
 }
 
 /* Placeholder message when no layer selected */
@@ -1831,9 +1895,9 @@ body.wm-workspace-active .main-content {
 /* ---- Right panel mode toggle + add ---- */
 .wm-right__mode-add {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 12px;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
 .wm-right__mode-btn {
@@ -1866,22 +1930,59 @@ body.wm-workspace-active .main-content {
 .wm-right__add-layer {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 14px;
-  border: 1px dashed #c4b5fd;
-  border-radius: 8px;
-  background: #f5f3ff;
-  color: #8b5cf6;
-  font-size: 0.8rem;
-  font-weight: 600;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
   font-family: inherit;
+  letter-spacing: 0.2px;
+  position: relative;
+  overflow: hidden;
 }
 
-.wm-right__add-layer:hover {
-  background: #ede9fe;
-  border-color: #8b5cf6;
+.wm-right__add-layer--text {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+}
+
+.wm-right__add-layer--text:hover {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  transform: translateY(-1px);
+}
+
+.wm-right__add-layer--image {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+
+.wm-right__add-layer--image:hover {
+  background: linear-gradient(135deg, #0891b2, #2563eb);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.wm-right__add-layer i {
+  font-size: 1rem;
+}
+
+.wm-right__add-layer:active {
+  transform: translateY(0);
+}
+
+.wm-right__add-layer:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ---- Layer List ---- */
@@ -1959,6 +2060,11 @@ body.wm-workspace-active .main-content {
 .wm-layer-item__btn--danger:hover {
   background: #fef2f2;
   color: #ef4444;
+}
+
+.wm-layer-item__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .wm-no-layers-mini {

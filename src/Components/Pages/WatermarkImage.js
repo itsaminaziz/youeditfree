@@ -145,6 +145,7 @@ const WatermarkImage = () => {
   const selected = images.find((i) => i.id === selectedImgId) || null;
   const totalSize = images.reduce((s, i) => s + i.file.size, 0);
   const selectedLayer = layers.find((l) => l.id === selectedLayerId) || null;
+  const isPrivateMode = !!(selectedImgId && privateImages[selectedImgId]);
 
   /* Close dropdown when selection changes */
   useEffect(() => { setOpenDropdown(null); }, [selectedLayerId]);
@@ -335,7 +336,7 @@ const WatermarkImage = () => {
       else if (e.key === 'ArrowRight') dx = step;
       else if (e.key === 'ArrowUp') dy = -step;
       else if (e.key === 'ArrowDown') dy = step;
-      else if (e.key === 'Delete') { deleteLayer(selectedLayerId); return; }
+      else if (e.key === 'Delete') { if (!isPrivateMode) deleteLayer(selectedLayerId); return; }
       else return;
       e.preventDefault();
       setShowGuides(true);
@@ -344,7 +345,7 @@ const WatermarkImage = () => {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [selectedLayerId, checkGuides, deleteLayer]);
+  }, [selectedLayerId, checkGuides, deleteLayer, isPrivateMode]);
 
   /* --- add text layer --- */
   const addTextLayer = () => {
@@ -542,8 +543,10 @@ const WatermarkImage = () => {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
 
-    /* Scale factor for proportional watermark sizing on different-sized images */
-    const sf = refDims ? Math.min(canvas.width / refDims.w, canvas.height / refDims.h) : 1;
+    /* Scale factors for proportional watermark sizing on different-sized images */
+    const sfW = refDims ? canvas.width / refDims.w : 1;
+    const sfH = refDims ? canvas.height / refDims.h : 1;
+    const sfSize = Math.min(sfW, sfH); /* size scales by smaller axis to keep aspect */
 
     /* Helper: draw a single layer instance at given offset */
     const drawLayerAt = async (layer, ox, oy) => {
@@ -626,19 +629,20 @@ const WatermarkImage = () => {
       if (!rawLayer.visible) continue;
 
       /* Scale layer proportionally for different-sized images */
-      const layer = sf === 1 ? rawLayer : {
+      const noScale = sfW === 1 && sfH === 1;
+      const layer = noScale ? rawLayer : {
         ...rawLayer,
-        x: rawLayer.x * sf, y: rawLayer.y * sf,
-        width: rawLayer.width * sf, height: rawLayer.height * sf,
-        fontSize: rawLayer.type === 'text' ? rawLayer.fontSize * sf : rawLayer.fontSize,
-        strokeWidth: (rawLayer.strokeWidth || 0) * sf,
-        borderWidth: (rawLayer.borderWidth || 0) * sf,
-        borderRadius: (rawLayer.borderRadius || 0) * sf,
-        borderRadiusTL: (rawLayer.borderRadiusTL || 0) * sf,
-        borderRadiusTR: (rawLayer.borderRadiusTR || 0) * sf,
-        borderRadiusBL: (rawLayer.borderRadiusBL || 0) * sf,
-        borderRadiusBR: (rawLayer.borderRadiusBR || 0) * sf,
-        tileSpacing: (rawLayer.tileSpacing || 0) * sf,
+        x: rawLayer.x * sfW, y: rawLayer.y * sfH,
+        width: rawLayer.width * sfSize, height: rawLayer.height * sfSize,
+        fontSize: rawLayer.type === 'text' ? rawLayer.fontSize * sfSize : rawLayer.fontSize,
+        strokeWidth: (rawLayer.strokeWidth || 0) * sfSize,
+        borderWidth: (rawLayer.borderWidth || 0) * sfSize,
+        borderRadius: (rawLayer.borderRadius || 0) * sfSize,
+        borderRadiusTL: (rawLayer.borderRadiusTL || 0) * sfSize,
+        borderRadiusTR: (rawLayer.borderRadiusTR || 0) * sfSize,
+        borderRadiusBL: (rawLayer.borderRadiusBL || 0) * sfSize,
+        borderRadiusBR: (rawLayer.borderRadiusBR || 0) * sfSize,
+        tileSpacing: (rawLayer.tileSpacing || 0) * sfSize,
       };
 
       if (layer.tile && layer.tile !== 'none') {
@@ -890,8 +894,15 @@ const WatermarkImage = () => {
             <>
               {/* Top toolbar: tools only (mode toggle moved to right panel) */}
               <div className="wm-top-toolbar">
+                {/* Private mode banner */}
+                {isPrivateMode && selectedLayer && (
+                  <div className="wm-top-toolbar__placeholder" style={{ color: '#7c3aed' }}>
+                    <i className="fa-solid fa-lock"></i> Private Mode — only move, resize, and change font size are allowed
+                  </div>
+                )}
+
                 {/* Text layer tools */}
-                {selectedLayer?.type === 'text' && (
+                {!isPrivateMode && selectedLayer?.type === 'text' && (
                   <div className="wm-top-toolbar__tools">
                     <select className="wm-top-toolbar__select" value={selectedLayer.fontFamily} onChange={(e) => updateLayer(selectedLayer.id, { fontFamily: e.target.value })}>
                       {FONTS.map((f) => <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>)}
@@ -992,7 +1003,7 @@ const WatermarkImage = () => {
                 )}
 
                 {/* Image layer tools */}
-                {selectedLayer?.type === 'image' && (
+                {!isPrivateMode && selectedLayer?.type === 'image' && (
                   <div className="wm-top-toolbar__tools">
                     <button className={`wm-top-toolbar__btn ${selectedLayer.flipH ? 'active' : ''}`} onClick={() => updateLayer(selectedLayer.id, { flipH: !selectedLayer.flipH })} title="Flip Horizontal"><i className="fa-solid fa-arrows-left-right"></i></button>
                     <button className={`wm-top-toolbar__btn ${selectedLayer.flipV ? 'active' : ''}`} onClick={() => updateLayer(selectedLayer.id, { flipV: !selectedLayer.flipV })} title="Flip Vertical"><i className="fa-solid fa-arrows-up-down"></i></button>
@@ -1145,11 +1156,11 @@ const WatermarkImage = () => {
                         {layer.type === 'text' ? (
                           <span
                             className="wm-layer__text"
-                            contentEditable={!layer.locked}
+                            contentEditable={!layer.locked && !isPrivateMode}
                             suppressContentEditableWarning
                             style={textStyle(layer)}
                             ref={(el) => { if (el && !el.dataset.inited) { el.textContent = layer.text || ''; el.dataset.inited = '1'; } }}
-                            onInput={(e) => updateLayer(layer.id, { text: e.currentTarget.textContent })}
+                            onInput={(e) => { if (!isPrivateMode) updateLayer(layer.id, { text: e.currentTarget.textContent }); }}
                             onFocus={() => setSelectedLayerId(layer.id)}
                           />
                         ) : (
@@ -1186,9 +1197,17 @@ const WatermarkImage = () => {
                       <button
                         className={`wm-left__private ${privateImages[selectedImgId] ? 'wm-left__private--active' : ''}`}
                         onClick={() => togglePrivate(selectedImgId)}
-                        title={privateImages[selectedImgId] ? 'This image has its own watermark settings (click to share)' : 'Make this image have its own watermark settings'}
                       >
                         <i className={`fa-solid ${privateImages[selectedImgId] ? 'fa-lock' : 'fa-lock-open'}`}></i>
+                        Private Mode
+                        <span className="wm-left__private-info">
+                          i
+                          <span className="wm-left__private-tooltip">
+                            {privateImages[selectedImgId]
+                              ? 'Private Mode ON: Only move and resize watermarks on this image. All other settings are disabled.'
+                              : 'Enable Private Mode to adjust only position and size for this image, without changing shared watermark settings.'}
+                          </span>
+                        </span>
                       </button>
                     )}
                     <button className="wm-left__download" onClick={() => downloadSingle(selected)} disabled={processing}>
@@ -1239,10 +1258,10 @@ const WatermarkImage = () => {
 
             {/* Add Text / Add Image buttons */}
             <div className="wm-right__mode-add">
-              <button className="wm-right__add-layer" onClick={addTextLayer} title="Add Text Layer">
+              <button className="wm-right__add-layer wm-right__add-layer--text" onClick={addTextLayer} title="Add Text Layer" disabled={isPrivateMode}>
                 <i className="fa-solid fa-font"></i> Add Text
               </button>
-              <button className="wm-right__add-layer" onClick={() => wmImageInputRef.current?.click()} title="Add Image Layer">
+              <button className="wm-right__add-layer wm-right__add-layer--image" onClick={() => wmImageInputRef.current?.click()} title="Add Image Layer" disabled={isPrivateMode}>
                 <i className="fa-solid fa-image"></i> Add Image
               </button>
             </div>
@@ -1263,18 +1282,21 @@ const WatermarkImage = () => {
                     {layer.type === 'text' ? (layer.text || 'Text Layer') : 'Image Layer'}
                   </span>
                   <button className={`wm-layer-item__btn ${!layer.visible ? 'active' : ''}`}
-                    onClick={(e) => { e.stopPropagation(); updateLayer(layer.id, { visible: !layer.visible }); }}
-                    title={layer.visible ? 'Hide' : 'Show'}>
+                    onClick={(e) => { e.stopPropagation(); if (!isPrivateMode) updateLayer(layer.id, { visible: !layer.visible }); }}
+                    title={layer.visible ? 'Hide' : 'Show'}
+                    disabled={isPrivateMode}>
                     <i className={`fa-solid ${layer.visible ? 'fa-eye' : 'fa-eye-slash'}`}></i>
                   </button>
                   <button className={`wm-layer-item__btn ${layer.locked ? 'active' : ''}`}
-                    onClick={(e) => { e.stopPropagation(); updateLayer(layer.id, { locked: !layer.locked }); }}
-                    title={layer.locked ? 'Unlock' : 'Lock'}>
+                    onClick={(e) => { e.stopPropagation(); if (!isPrivateMode) updateLayer(layer.id, { locked: !layer.locked }); }}
+                    title={layer.locked ? 'Unlock' : 'Lock'}
+                    disabled={isPrivateMode}>
                     <i className={`fa-solid ${layer.locked ? 'fa-lock' : 'fa-lock-open'}`}></i>
                   </button>
                   <button className="wm-layer-item__btn wm-layer-item__btn--danger"
-                    onClick={(e) => { e.stopPropagation(); deleteLayer(layer.id); }}
-                    title="Delete">
+                    onClick={(e) => { e.stopPropagation(); if (!isPrivateMode) deleteLayer(layer.id); }}
+                    title="Delete"
+                    disabled={isPrivateMode}>
                     <i className="fa-solid fa-trash"></i>
                   </button>
                 </div>
