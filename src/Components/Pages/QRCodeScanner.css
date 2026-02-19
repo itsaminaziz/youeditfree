@@ -256,14 +256,19 @@
   left: 8px;
   right: 8px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #4f46e5, transparent);
-  animation: qrscanLine 2s ease-in-out infinite;
-  box-shadow: 0 0 8px rgba(79, 70, 229, 0.5);
+  background: linear-gradient(90deg, transparent 0%, #818cf8 25%, #4f46e5 50%, #818cf8 75%, transparent 100%);
+  animation: qrscanLine 2.8s linear infinite;
+  box-shadow: 0 0 12px rgba(79, 70, 229, 0.6), 0 0 4px rgba(129, 140, 248, 0.4);
+  border-radius: 2px;
 }
 
 @keyframes qrscanLine {
-  0%, 100% { top: 8px; }
-  50% { top: calc(100% - 10px); }
+  0%   { top: 8px; opacity: 0.3; }
+  5%   { opacity: 1; }
+  50%  { top: calc(100% - 10px); opacity: 1; }
+  55%  { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 8px; opacity: 0.3; }
 }
 
 /* Camera controls */
@@ -371,6 +376,38 @@
   color: #b0b8c9 !important;
 }
 
+/* Scan from Gallery */
+.qrscan-upload-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.qrscan-gallery-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 26px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+}
+
+.qrscan-gallery-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+}
+
+.qrscan-gallery-btn:active {
+  transform: translateY(0);
+}
+
 /* ---- Features Row ---- */
 .qrscan-features {
   display: grid;
@@ -451,7 +488,6 @@
 .qrscan-cam-popup__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 16px 20px;
   background: rgba(255, 255, 255, 0.05);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -459,9 +495,16 @@
   font-size: 0.92rem;
   font-weight: 700;
   flex-shrink: 0;
+  gap: 12px;
 }
 
-.qrscan-cam-popup__header i {
+.qrscan-cam-popup__header span {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.qrscan-cam-popup__header span i {
   margin-right: 8px;
   color: #818cf8;
 }
@@ -479,6 +522,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.15s;
+  flex-shrink: 0;
 }
 
 .qrscan-cam-popup__close:hover {

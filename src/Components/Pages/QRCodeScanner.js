@@ -79,15 +79,15 @@ const QRCodeScanner = () => {
     loadJsQR().then(() => setJsQRLoaded(true)).catch(() => {});
   }, []);
 
-  /* ---------- lock body scroll when camera popup is open ---------- */
+  /* ---------- lock body scroll when camera or result popup is open ---------- */
   useEffect(() => {
-    if (showCamera) {
+    if (showCamera || showPopup) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
-  }, [showCamera]);
+  }, [showCamera, showPopup]);
 
   /* ---------- stop camera ---------- */
   const stopCamera = useCallback(() => {
@@ -236,6 +236,24 @@ const QRCodeScanner = () => {
     if (file) { stopCamera(); scanImage(file); }
   }, [stopCamera, scanImage]);
 
+  /* ---------- Ctrl+V paste support ---------- */
+  useEffect(() => {
+    const handlePaste = (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) { stopCamera(); scanImage(file); }
+          return;
+        }
+      }
+    };
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [stopCamera, scanImage]);
+
   const onDrop = (e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); };
 
   /* ---------- copy to clipboard ---------- */
@@ -365,13 +383,18 @@ const QRCodeScanner = () => {
                 <span>Upload Image</span>
               </div>
 
-              <div className="qrscan-upload-area" onClick={() => fileInputRef.current?.click()}>
+              <div className="qrscan-upload-area">
                 <div className="qrscan-upload-icon">
                   <i className="fa-solid fa-cloud-arrow-up"></i>
                 </div>
                 <h3>Drop QR code image here</h3>
-                <p>or <span className="qrscan-browse">browse files</span> to scan</p>
-                <p className="qrscan-upload-hint">Supports JPG, PNG, GIF, WEBP</p>
+                <p>or <span className="qrscan-browse" onClick={() => fileInputRef.current?.click()}>browse files</span> to scan</p>
+                <p className="qrscan-upload-hint">Supports JPG, PNG, GIF, WEBP &bull; Ctrl+V to paste</p>
+                <div className="qrscan-upload-actions">
+                  <button className="qrscan-gallery-btn" onClick={() => fileInputRef.current?.click()}>
+                    <i className="fa-solid fa-images"></i> Scan from Gallery
+                  </button>
+                </div>
               </div>
 
               <input
