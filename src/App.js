@@ -16,6 +16,7 @@ import MemeGenerator from './Components/Pages/MemeGenerator';
 import UpscaleImage from './Components/Pages/UpscaleImage';
 import QRCodeGenerator from './Components/Pages/QRCodeGenerator';
 import QRCodeScanner from './Components/Pages/QRCodeScanner';
+import FaceBlur from './Components/Pages/FaceBlur';
 import ScrollToTop from './Components/ScrollToTop';
 import './App.css';
 
@@ -42,6 +43,7 @@ function App() {
               <Route path="/upscale-image" element={<UpscaleImage />} />
               <Route path="/qr-code-generator" element={<QRCodeGenerator />} />
               <Route path="/qr-code-scanner" element={<QRCodeScanner />} />
+              <Route path="/face-blur" element={<FaceBlur />} />
             </Routes>
           </main>
           <Footer />
