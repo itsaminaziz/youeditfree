@@ -1,15 +1,17 @@
 {
   "files": {
-    "main.css": "/youeditfree/static/css/main.ef00de7e.css",
-    "main.js": "/youeditfree/static/js/main.be812a18.js",
+    "main.css": "/youeditfree/static/css/main.3020cf6e.css",
+    "main.js": "/youeditfree/static/js/main.17061c9a.js",
+    "static/js/159.b4f5ea42.chunk.js": "/youeditfree/static/js/159.b4f5ea42.chunk.js",
     "static/js/453.b355b68f.chunk.js": "/youeditfree/static/js/453.b355b68f.chunk.js",
     "index.html": "/youeditfree/index.html",
-    "main.ef00de7e.css.map": "/youeditfree/static/css/main.ef00de7e.css.map",
-    "main.be812a18.js.map": "/youeditfree/static/js/main.be812a18.js.map",
+    "main.3020cf6e.css.map": "/youeditfree/static/css/main.3020cf6e.css.map",
+    "main.17061c9a.js.map": "/youeditfree/static/js/main.17061c9a.js.map",
+    "159.b4f5ea42.chunk.js.map": "/youeditfree/static/js/159.b4f5ea42.chunk.js.map",
     "453.b355b68f.chunk.js.map": "/youeditfree/static/js/453.b355b68f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ef00de7e.css",
-    "static/js/main.be812a18.js"
+    "static/css/main.3020cf6e.css",
+    "static/js/main.17061c9a.js"
   ]
 }
